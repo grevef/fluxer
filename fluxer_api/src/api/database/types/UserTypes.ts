@@ -43,6 +43,9 @@ export interface UserRow {
 	bio: string | null;
 	pronouns: string | null;
 	accent_color: number | null;
+	display_name_font_id?: number | null;
+	display_name_effect_id?: number | null;
+	display_name_colors?: Array<number> | null;
 	timezone: string | null;
 	timezone_privacy_flags: number | null;
 	date_of_birth: LocalDate | null;
@@ -113,6 +116,9 @@ export const USER_COLUMNS = [
 	'bio',
 	'pronouns',
 	'accent_color',
+	'display_name_font_id',
+	'display_name_effect_id',
+	'display_name_colors',
 	'timezone',
 	'timezone_privacy_flags',
 	'date_of_birth',
@@ -182,6 +188,9 @@ export const EMPTY_USER_ROW: UserRow = {
 	bio: null,
 	pronouns: null,
 	accent_color: null,
+	display_name_font_id: null,
+	display_name_effect_id: null,
+	display_name_colors: null,
 	timezone: null,
 	timezone_privacy_flags: null,
 	date_of_birth: null,

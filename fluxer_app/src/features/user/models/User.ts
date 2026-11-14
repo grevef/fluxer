@@ -4,6 +4,7 @@ import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
 import {LimitResolver} from '@app/features/app/utils/LimitResolverAdapter';
 import DeveloperOptions from '@app/features/devtools/state/DeveloperOptions';
 import {getPremiumGraceEndDate} from '@app/features/premium/utils/PremiumGrace';
+import {displayNameStylesEqual} from '@app/features/user/utils/DisplayNameStyleUtils';
 import {formatUserTag} from '@app/features/user/utils/UserTagUtils';
 import {
 	type AccountTier,
@@ -23,6 +24,7 @@ import {
 } from '@fluxer/constants/src/UserConstants';
 import {UserTraits} from '@fluxer/constants/src/UserTraitConstants';
 import {DEFAULT_STOCK_LIMITS} from '@fluxer/limits/src/LimitDefaults';
+import type {DisplayNameStylesResponse} from '@fluxer/schema/src/domains/user/DisplayNameStyleSchemas';
 import type {UserPartial, UserPrivate, User as WireUser} from '@fluxer/schema/src/domains/user/UserResponseSchemas';
 import * as SnowflakeUtils from '@fluxer/snowflake/src/SnowflakeUtils';
 
@@ -144,6 +146,7 @@ export class User {
 	readonly system: boolean;
 	readonly flags: number;
 	readonly mentionFlags: MentionReplyPreference;
+	readonly displayNameStyles: DisplayNameStylesResponse | null;
 	readonly avatarColor: number | null | undefined;
 	private readonly _isStaff: boolean | undefined;
 	private readonly _email: string | null | undefined;
@@ -186,6 +189,7 @@ export class User {
 	private readonly _termsAgreedAt: Date | null | undefined;
 	private readonly _privacyAgreedAt: Date | null | undefined;
 	private readonly _traits: ReadonlyArray<string>;
+	private readonly _acls: ReadonlyArray<string> | undefined;
 	private readonly _claimed: boolean | undefined;
 	private readonly _accountTier: AccountTier | undefined;
 	private readonly _verificationNeed: AccountVerificationNeed | null | undefined;
@@ -204,8 +208,12 @@ export class User {
 		this.system = user.system ?? false;
 		this.flags = user.flags;
 		this.mentionFlags = user.mention_flags ?? 0;
+		this.displayNameStyles = user.display_name_styles ?? null;
 		this.avatarColor = hasKey(user, 'avatar_color') ? user.avatar_color : undefined;
 		this._isStaff = hasKey(user, 'is_staff') ? user.is_staff : undefined;
+		this._acls = hasKey(user, 'acls')
+			? Object.freeze(dedupeFiltered((user.acls ?? []) as ReadonlyArray<unknown>, parseStringItem))
+			: undefined;
 		this._email = hasKey(user, 'email') ? (user.email ?? null) : undefined;
 		this._emailBounced = hasKey(user, 'email_bounced') ? user.email_bounced : undefined;
 		this._accountLimited = hasKey(user, 'account_limited') ? user.account_limited : undefined;
@@ -410,6 +418,14 @@ export class User {
 			flags: u.flags ?? this.flags,
 			mention_flags: hasKey(u, 'mention_flags') ? u.mention_flags : this.mentionFlags || undefined,
 		};
+		// Partial payloads omit display_name_styles when unset, so a full payload without it means it was cleared.
+		let displayNameStyles = this.displayNameStyles ?? undefined;
+		if (hasKey(u, 'display_name_styles')) {
+			displayNameStyles = u.display_name_styles;
+		} else if (hasKey(u, 'username')) {
+			displayNameStyles = undefined;
+		}
+		if (displayNameStyles) result.display_name_styles = displayNameStyles;
 		const isStaff = pickField(this._isStaff, u, 'is_staff', opts);
 		if (isStaff !== undefined) result.is_staff = isStaff;
 		const avatarColor = pickField(this.avatarColor, u, 'avatar_color', opts);
@@ -436,6 +452,18 @@ export class User {
 		if (timezonePrivacyFlags !== undefined) result.timezone_privacy_flags = timezonePrivacyFlags;
 		const mfaEnabled = pickField(this.mfaEnabled, u, 'mfa_enabled', opts);
 		if (mfaEnabled !== undefined) result.mfa_enabled = mfaEnabled;
+		if (hasKey(u, 'acls') || this._acls !== undefined || opts.clearMissing) {
+			result.acls = [
+				...mergeAuthoritativeArray(
+					this._acls ?? EMPTY_STRING_ARRAY,
+					u,
+					'acls',
+					parseStringItem,
+					opts,
+					EMPTY_STRING_ARRAY,
+				),
+			];
+		}
 		if (hasKey(u, 'authenticator_types') || this.authenticatorTypes !== undefined || opts.clearMissing) {
 			result.authenticator_types = mergeAuthoritativeArray(
 				this.authenticatorTypes ?? EMPTY_AUTH_TYPES,
@@ -627,6 +655,10 @@ export class User {
 		return this._isStaff ?? (this.flags & PublicUserFlags.STAFF) !== 0;
 	}
 
+	hasAcl(acl: string): boolean {
+		return this._acls?.includes(acl) ?? false;
+	}
+
 	isClaimed(): boolean {
 		return this.accountTier !== AccountTiers.UNCLAIMED;
 	}
@@ -702,7 +734,9 @@ export class User {
 			this.system === other.system &&
 			this.flags === other.flags &&
 			this.mentionFlags === other.mentionFlags &&
+			displayNameStylesEqual(this.displayNameStyles, other.displayNameStyles) &&
 			this._isStaff === other._isStaff &&
+			arraysShallowEqual(this._acls, other._acls) &&
 			this._email === other._email &&
 			this._emailBounced === other._emailBounced &&
 			this._accountLimited === other._accountLimited &&
@@ -764,12 +798,14 @@ export class User {
 			system: this.system,
 			flags: this.flags,
 			mention_flags: this.mentionFlags || undefined,
+			...(this.displayNameStyles ? {display_name_styles: this.displayNameStyles} : {}),
 		};
 		const privateFields: Record<string, unknown> = {};
 		const setOptional = <K extends keyof UserPrivate>(key: K, value: UserPrivate[K] | undefined): void => {
 			if (value !== undefined) privateFields[key as string] = value;
 		};
 		setOptional('is_staff', this._isStaff);
+		setOptional('acls', this._acls === undefined ? undefined : [...this._acls]);
 		setOptional('email', this._email);
 		setOptional('email_bounced', this._emailBounced);
 		setOptional('account_limited', this._accountLimited);

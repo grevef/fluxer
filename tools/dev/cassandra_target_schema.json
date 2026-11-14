@@ -10524,6 +10524,18 @@
 				{
 					"name": "age_attested_at",
 					"type": "timestamp"
+				},
+				{
+					"name": "display_name_font_id",
+					"type": "int"
+				},
+				{
+					"name": "display_name_effect_id",
+					"type": "int"
+				},
+				{
+					"name": "display_name_colors",
+					"type": "list<int>"
 				}
 			],
 			"primary_key": "((user_id))",

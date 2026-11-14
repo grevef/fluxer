@@ -10,6 +10,7 @@ import {LimitedProfileNotice} from '@app/features/user/components/popouts/Limite
 import {UserProfileBadges} from '@app/features/user/components/popouts/UserProfileBadges';
 import {UserProfileDataWarning} from '@app/features/user/components/popouts/UserProfileDataWarning';
 import {useAutoplayExpandedProfileAnimations} from '@app/features/user/hooks/useAutoplayExpandedProfileAnimations';
+import {getDisplayNameStyleProps} from '@app/features/user/utils/DisplayNameStyleUtils';
 import * as NicknameUtils from '@app/features/user/utils/NicknameUtils';
 import {canEditOwnProfileBadges} from '@app/features/user/utils/ProfileEditAccess';
 import {
@@ -54,7 +55,10 @@ export const UserInfo: React.FC<UserInfoProps> = observer(({user, profile, guild
 						</div>
 					)}
 					<div className={userProfileModalStyles.nameRow} data-flx="user.user-profile-modal.user-info.div--5">
-						<span className={userProfileModalStyles.userName} data-flx="user.user-profile-modal.user-info.span">
+						<span
+							{...getDisplayNameStyleProps(user.displayNameStyles, {className: userProfileModalStyles.userName})}
+							data-flx="user.user-profile-modal.user-info.span"
+						>
 							{displayName}
 						</span>
 						{user.bot && (

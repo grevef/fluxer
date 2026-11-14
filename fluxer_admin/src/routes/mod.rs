@@ -129,6 +129,9 @@ async fn security_headers_middleware(
     let config = state.config();
 
     fluxer_common::server::set_baseline_security_headers(headers, PERMISSIONS_POLICY_VALUE);
+    // frame-ancestors in the CSP below decides who may frame the panel; X-Frame-Options cannot
+    // name the web app's origin, so it would block the in-app admin page.
+    headers.remove(header::X_FRAME_OPTIONS);
 
     let csp = build_admin_csp(config);
     if let Ok(value) = HeaderValue::from_str(&csp) {
@@ -143,6 +146,8 @@ async fn security_headers_middleware(
 fn build_admin_csp(config: &AdminConfig) -> String {
     let mut img_sources = vec!["'self'".to_owned(), "data:".to_owned(), "blob:".to_owned()];
     img_sources.extend(config.image_origins());
+    let mut frame_ancestors = vec!["'self'".to_owned()];
+    frame_ancestors.extend(config.frame_ancestor_origins());
     [
         "default-src 'self'".to_owned(),
         "script-src 'self' 'unsafe-inline'".to_owned(),
@@ -154,7 +159,7 @@ fn build_admin_csp(config: &AdminConfig) -> String {
         "frame-src 'none'".to_owned(),
         "base-uri 'self'".to_owned(),
         "form-action 'self'".to_owned(),
-        "frame-ancestors 'none'".to_owned(),
+        format!("frame-ancestors {}", frame_ancestors.join(" ")),
     ]
     .join("; ")
 }

@@ -10,6 +10,7 @@ import {createLimitMatchContext} from '@app/api/limits/LimitMatchContextBuilder'
 import {profileSubstringBlocklistCache} from '@app/api/middleware/ProfileSubstringBlocklistCache';
 import {getCustomBadgeCatalog} from '@app/api/middleware/ServiceSingletons';
 import type {User} from '@app/api/models/User';
+import {displayNameStylesEqual, displayNameStylesToRow} from '@app/api/user/DisplayNameStyles';
 import {
 	dropUndefinedCustomBadgeKeys,
 	hiddenCustomBadgeIds,
@@ -28,6 +29,7 @@ import {isSupportedTimeZoneId} from '@fluxer/date_utils/src/TimeZoneUtils';
 import {ContentBlockedError} from '@fluxer/errors/src/domains/content/ContentBlockedError';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {MissingAccessError} from '@fluxer/errors/src/domains/core/MissingAccessError';
+import type {DisplayNameStylesRequest} from '@fluxer/schema/src/domains/user/DisplayNameStyleSchemas';
 import type {UserUpdateRequest} from '@fluxer/schema/src/domains/user/UserRequestSchemas';
 import type {IRateLimitService} from '@pkgs/rate_limit/src/IRateLimitService';
 import {ms} from 'itty-time';
@@ -81,6 +83,9 @@ export class UserAccountProfileService {
 		}
 		if (data.accent_color !== undefined) {
 			await this.processAccentColorUpdate({user, accentColor: data.accent_color, updates});
+		}
+		if (data.display_name_styles !== undefined) {
+			await this.processDisplayNameStylesUpdate({user, styles: data.display_name_styles, updates});
 		}
 		if (data.timezone !== undefined) {
 			const nextTimezone = this.processTimezoneUpdate({user, timezone: data.timezone, updates});
@@ -231,6 +236,40 @@ export class UserAccountProfileService {
 			}
 			updates.accent_color = accentColor;
 		}
+	}
+
+	private async processDisplayNameStylesUpdate(params: {
+		user: User;
+		styles: DisplayNameStylesRequest | null;
+		updates: UserFieldUpdates;
+	}): Promise<void> {
+		const {user, styles, updates} = params;
+		if (displayNameStylesEqual(styles, user.displayNameStyles)) return;
+		if (styles !== null) {
+			const ctx = createLimitMatchContext({user});
+			const hasDisplayNameStyles = resolveLimitSafe(
+				this.deps.limitConfigService.getConfigSnapshot(),
+				ctx,
+				'feature_display_name_styles',
+				0,
+			);
+			if (hasDisplayNameStyles === 0) {
+				throw InputValidationError.create('display_name_styles', 'Display name styles require premium');
+			}
+			const rateLimit = await this.deps.rateLimitService.checkLimit({
+				identifier: `display_name_styles_change:${user.id}`,
+				maxAttempts: 25,
+				windowMs: ms('30 minutes'),
+			});
+			if (!rateLimit.allowed) {
+				const minutes = Math.ceil((rateLimit.retryAfter || 0) / 60);
+				throw InputValidationError.create(
+					'display_name_styles',
+					`Display name style changed too many times, try again in ${minutes} minutes`,
+				);
+			}
+		}
+		Object.assign(updates, displayNameStylesToRow(styles));
 	}
 
 	private processTimezoneUpdate(params: {

@@ -119,6 +119,13 @@ impl AdminConfig {
         endpoint_origin(&self.admin_endpoint)
     }
 
+    /// The web app embeds the admin panel on its in-app admin page, so it may frame it.
+    pub fn frame_ancestor_origins(&self) -> Vec<String> {
+        endpoint_origin(&self.web_app_endpoint)
+            .into_iter()
+            .collect()
+    }
+
     pub fn image_origins(&self) -> Vec<String> {
         let api = if self.api_public_endpoint.is_empty() {
             &self.api_endpoint

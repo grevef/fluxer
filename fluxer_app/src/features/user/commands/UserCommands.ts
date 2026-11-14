@@ -10,6 +10,7 @@ import {http} from '@app/features/platform/transport/RestTransport';
 import {Logger} from '@app/features/platform/utils/AppLogger';
 import Users from '@app/features/user/state/Users';
 import type {Message as WireMessage} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
+import type {DisplayNameStylesRequest} from '@fluxer/schema/src/domains/user/DisplayNameStyleSchemas';
 import type {
 	HarvestDownloadUrlResponse,
 	HarvestStatusResponse,
@@ -59,7 +60,8 @@ interface EmailChangeVerifyNewResponse {
 	email_token: string;
 }
 
-type UserUpdatePayload = Partial<UserPrivate> & {
+type UserUpdatePayload = Omit<Partial<UserPrivate>, 'display_name_styles'> & {
+	display_name_styles?: DisplayNameStylesRequest | null;
 	avatar?: string | null;
 	password?: string;
 	new_password?: string;

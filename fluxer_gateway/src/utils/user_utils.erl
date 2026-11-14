@@ -17,7 +17,8 @@ partial_user_fields() ->
         <<"bot">>,
         <<"system">>,
         <<"flags">>,
-        <<"mention_flags">>
+        <<"mention_flags">>,
+        <<"display_name_styles">>
     ].
 
 -spec normalize_user(map() | term()) -> map().
@@ -28,7 +29,11 @@ normalize_user(User) when is_map(User) ->
         partial_user_fields()
     ),
     case profile_restricted(User) of
-        true -> Normalized#{<<"global_name">> => null, <<"avatar">> => null};
+        true ->
+            maps:remove(
+                <<"display_name_styles">>,
+                Normalized#{<<"global_name">> => null, <<"avatar">> => null}
+            );
         false -> Normalized
     end;
 normalize_user(_) ->
@@ -51,6 +56,10 @@ normalize_field(<<"flags">>, Value) ->
     bitset:parse(Value);
 normalize_field(<<"mention_flags">>, Value) ->
     bitset:parse(Value);
+normalize_field(<<"display_name_styles">>, Value) when is_map(Value) ->
+    Value;
+normalize_field(<<"display_name_styles">>, _Value) ->
+    undefined;
 normalize_field(_Key, Value) ->
     Value.
 

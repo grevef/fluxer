@@ -21,6 +21,7 @@ import {
 	isInteractionTierEnforced,
 } from '@app/api/user/AccountTier';
 import {isDateOfBirthMissing} from '@app/api/user/DateOfBirth';
+import {displayNameStylesEqual} from '@app/api/user/DisplayNameStyles';
 import {hiddenUserPartial, isProfileHidden} from '@app/api/user/ProfileVisibility';
 import {deprecatedBadgeHideFields} from '@app/api/user/profile_badges/HiddenProfileBadges';
 import {canUserAccessNsfwContent, isMatureContentUnlocked} from '@app/api/utils/AgeUtils';
@@ -79,7 +80,9 @@ function sortUserIds(userIds: Iterable<UserID>): Array<string> {
 export function mapUserToPartialResponse(user: User): UserPartialResponse {
 	const partial = mapUserToOwnPartialResponse(user);
 	if (isProfileHidden(user) && !isDeletedForDisplay(user)) return hiddenUserPartial(partial);
-	return isProfileRestricted(user) ? {...partial, global_name: null, avatar: null} : partial;
+	return isProfileRestricted(user)
+		? {...partial, global_name: null, avatar: null, display_name_styles: undefined}
+		: partial;
 }
 
 function isProfileRestricted(user: User): boolean {
@@ -118,6 +121,7 @@ function mapUserToOwnPartialResponse(user: User): UserPartialResponse {
 		system: user.isSystem || undefined,
 		flags: mapUserFlagsToPublicBitfield(user),
 		mention_flags: user.mentionFlags ? user.mentionFlags : undefined,
+		display_name_styles: user.displayNameStyles ?? undefined,
 	};
 }
 
@@ -133,7 +137,8 @@ export function hasPartialUserFieldsChanged(oldUser: User, newUser: User): boole
 		oldPartial.bot !== newPartial.bot ||
 		oldPartial.system !== newPartial.system ||
 		oldPartial.flags !== newPartial.flags ||
-		oldPartial.mention_flags !== newPartial.mention_flags
+		oldPartial.mention_flags !== newPartial.mention_flags ||
+		!displayNameStylesEqual(oldPartial.display_name_styles ?? null, newPartial.display_name_styles ?? null)
 	);
 }
 

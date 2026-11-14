@@ -21,6 +21,7 @@ import {AccountTierSchema, AccountVerificationNeedSchema} from '@fluxer/schema/s
 import {ConnectionResponse} from '@fluxer/schema/src/domains/connection/ConnectionSchemas';
 import {GuildMemberResponse} from '@fluxer/schema/src/domains/guild/GuildMemberSchemas';
 import {MessageResponseSchema} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
+import {DisplayNameStylesResponse} from '@fluxer/schema/src/domains/user/DisplayNameStyleSchemas';
 import {ProfileBadgeListResponse} from '@fluxer/schema/src/domains/user/ProfileBadgeSchemas';
 import {LocaleSchema, RegionalFormatSchema} from '@fluxer/schema/src/primitives/LocaleSchema';
 import {
@@ -71,6 +72,9 @@ export const UserPartialResponse = z.object({
 		.describe(
 			"The user's account-wide reply mention preference. Omitted when the user has no preference set (treated as NO_PREFERENCE).",
 		),
+	display_name_styles: DisplayNameStylesResponse.optional().describe(
+		'The font, effect and colors the user picked for their display name. Omitted when unset.',
+	),
 });
 
 export type UserPartialResponse = z.infer<typeof UserPartialResponse>;
@@ -557,6 +561,7 @@ export interface UserPartial {
 	readonly system?: boolean;
 	readonly flags: number;
 	readonly mention_flags?: MentionReplyPreference;
+	readonly display_name_styles?: DisplayNameStylesResponse;
 }
 
 export interface UserPrivate extends UserPartial, UserProfile {
@@ -603,6 +608,7 @@ export interface UserPrivate extends UserPartial, UserProfile {
 	readonly terms_agreed_at?: string | null;
 	readonly privacy_agreed_at?: string | null;
 	readonly traits: ReadonlyArray<string>;
+	readonly acls?: ReadonlyArray<string>;
 	readonly claimed?: boolean;
 	readonly account_tier?: AccountTier;
 	readonly verification_need?: AccountVerificationNeed | null;

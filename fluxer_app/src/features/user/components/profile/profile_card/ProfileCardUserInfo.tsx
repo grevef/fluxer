@@ -6,7 +6,9 @@ import {useTextOverflow} from '@app/features/ui/hooks/useTextOverflow';
 import {Tooltip} from '@app/features/ui/tooltip/Tooltip';
 import styles from '@app/features/user/components/profile/profile_card/ProfileCardUserInfo.module.css';
 import type {User} from '@app/features/user/models/User';
+import {getDisplayNameStyleProps} from '@app/features/user/utils/DisplayNameStyleUtils';
 import * as NicknameUtils from '@app/features/user/utils/NicknameUtils';
+import type {DisplayNameStyles} from '@fluxer/constants/src/DisplayNameStyleConstants';
 import {Trans} from '@lingui/react/macro';
 import {clsx} from 'clsx';
 import {observer} from 'mobx-react-lite';
@@ -19,6 +21,7 @@ interface ProfileCardUserInfoProps {
 	displayName: string;
 	displayNameClassName?: string;
 	user: User;
+	displayNameStyles?: DisplayNameStyles | null;
 	pronouns?: string | null;
 	showUsername?: boolean;
 	isClickable?: boolean;
@@ -34,6 +37,7 @@ export const ProfileCardUserInfo: React.FC<ProfileCardUserInfoProps> = observer(
 		displayName,
 		displayNameClassName,
 		user,
+		displayNameStyles,
 		pronouns,
 		showUsername = true,
 		isClickable = true,
@@ -60,7 +64,12 @@ export const ProfileCardUserInfo: React.FC<ProfileCardUserInfoProps> = observer(
 				style={displayNameStyle}
 				data-flx="user.profile.profile-card.profile-card-user-info.name-button.display-name-click"
 			>
-				{displayName}
+				<span
+					{...getDisplayNameStyleProps(displayNameStyles === undefined ? user.displayNameStyles : displayNameStyles)}
+					data-flx="user.profile.profile-card.profile-card-user-info.display-name-text"
+				>
+					{displayName}
+				</span>
 			</button>
 		);
 		const displayNameContent = isDisplayNameOverflowing ? (

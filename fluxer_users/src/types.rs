@@ -8,7 +8,7 @@ use fluxer_common::user_flags::AccountStanding;
 use fluxer_common::user_flags::USER_FLAG_STAFF;
 pub use fluxer_common::user_partial::ApiUserPartial;
 use fluxer_common::user_partial::{
-    FLUXER_SYSTEM_USER_ID, UserPartialFields, default_instance_name,
+    DisplayNameStyles, FLUXER_SYSTEM_USER_ID, UserPartialFields, default_instance_name,
 };
 use serde::{Deserialize, Deserializer, Serialize};
 
@@ -103,6 +103,8 @@ pub struct UserPartial {
     pub content_hidden_since: Option<i64>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub hidden_profile_badges: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display_name_styles: Option<DisplayNameStyles>,
 }
 
 impl UserPartial {
@@ -120,6 +122,7 @@ impl UserPartial {
             banner_color: None,
             accent_color: None,
             avatar_color: None,
+            display_name_styles: None,
             ..self
         }
     }
@@ -137,6 +140,7 @@ impl UserPartial {
             flags: self.flags,
             hidden_profile_badges: self.hidden_profile_badges.clone(),
             mention_flags: self.mention_flags,
+            display_name_styles: self.display_name_styles.clone(),
         })
     }
 }
@@ -180,6 +184,7 @@ mod tests {
             mention_flags: Some(0),
             content_hidden_since: None,
             hidden_profile_badges: Vec::new(),
+            display_name_styles: None,
         }
     }
 

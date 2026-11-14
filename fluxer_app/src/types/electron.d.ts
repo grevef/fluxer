@@ -405,6 +405,11 @@ export interface ElectronAPI {
 	setApiAttachmentAuthorization?: (apiEndpoint: string, token: string | null) => Promise<boolean>;
 	reportInstanceProductName?: (instanceKey: string, productName: string) => void;
 	notifyFirstContentPainted?: (view?: 'restored') => void;
+	showAdminPanelView?: (request: {
+		url: string;
+		bounds: {x: number; y: number; width: number; height: number};
+	}) => Promise<boolean>;
+	hideAdminPanelView?: () => Promise<void>;
 	localAppUpload?: DesktopLocalAppUploadAPI;
 	localApp?: DesktopLocalAppInfo;
 	nativeGatewayTransport?: NativeGatewayTransportAPI;

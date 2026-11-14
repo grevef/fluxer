@@ -252,6 +252,11 @@ export type TrayActionPayload =
 			action: 'toggle-custom-css';
 	  };
 
+export interface AdminPanelViewRequest {
+	url: string;
+	bounds: {x: number; y: number; width: number; height: number};
+}
+
 export interface ElectronAPI {
 	platform: NodeJS.Platform;
 	buildChannel: BuildChannel;
@@ -413,6 +418,8 @@ export interface ElectronAPI {
 	setApiAttachmentAuthorization: (apiEndpoint: string, token: string | null) => Promise<boolean>;
 	reportInstanceProductName: (instanceKey: string, productName: string) => void;
 	notifyFirstContentPainted: (view?: 'restored') => void;
+	showAdminPanelView: (request: AdminPanelViewRequest) => Promise<boolean>;
+	hideAdminPanelView: () => Promise<void>;
 	desktopAccounts: DesktopAccountStorageAPI;
 	desktopStorage: DesktopStorageAPI;
 	desktopKnownInstances: DesktopKnownInstanceStorageAPI;

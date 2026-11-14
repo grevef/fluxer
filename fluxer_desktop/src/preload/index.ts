@@ -10,6 +10,7 @@ import {
 import {IS_OFFLINE_BUILD} from '@electron/common/OfflineBuild';
 import {readExactPlainRecord} from '@electron/common/PlainRecord';
 import type {
+	AdminPanelViewRequest,
 	AppMetricsSnapshot,
 	ClipboardWriteFileOptions,
 	ClipboardWriteFileResult,
@@ -438,6 +439,9 @@ const api: ElectronAPI = {
 		(callback) => window.requestAnimationFrame(callback),
 		releaseBootFrame,
 	),
+	showAdminPanelView: (request: AdminPanelViewRequest): Promise<boolean> =>
+		ipcRenderer.invoke('admin-panel-view:show', request) as Promise<boolean>,
+	hideAdminPanelView: (): Promise<void> => ipcRenderer.invoke('admin-panel-view:hide') as Promise<void>,
 	getDesktopInfo: (): Promise<DesktopInfo> => ipcRenderer.invoke('get-desktop-info'),
 	getGpuInfo: (): Promise<GpuInfo> => ipcRenderer.invoke('get-gpu-info'),
 	getAppMetrics: (): Promise<AppMetricsSnapshot> => ipcRenderer.invoke('get-app-metrics'),

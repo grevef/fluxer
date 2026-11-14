@@ -28767,6 +28767,10 @@
 					"mention_flags": {
 						"description": "The user's account-wide reply mention preference. Omitted when the user has no preference set (treated as NO_PREFERENCE).",
 						"$ref": "#/components/schemas/MentionReplyPreferences"
+					},
+					"display_name_styles": {
+						"description": "The font, effect and colors the user picked for their display name. Omitted when unset.",
+						"$ref": "#/components/schemas/DisplayNameStylesResponse"
 					}
 				},
 				"required": ["id", "username", "discriminator", "global_name", "avatar", "avatar_color", "flags"],
@@ -28928,6 +28932,10 @@
 					"mention_flags": {
 						"description": "The user's account-wide reply mention preference. Omitted when the user has no preference set (treated as NO_PREFERENCE).",
 						"$ref": "#/components/schemas/MentionReplyPreferences"
+					},
+					"display_name_styles": {
+						"description": "The font, effect and colors the user picked for their display name. Omitted when unset.",
+						"$ref": "#/components/schemas/DisplayNameStylesResponse"
 					},
 					"is_staff": {"type": "boolean", "description": "Whether the user has staff permissions"},
 					"acls": {
@@ -32419,6 +32427,10 @@
 						"description": "Profile accent color as integer",
 						"anyOf": [{"$ref": "#/components/schemas/ColorType"}, {"type": "null"}]
 					},
+					"display_name_styles": {
+						"description": "Font, effect and colors for the display name; requires premium. null clears it",
+						"anyOf": [{"$ref": "#/components/schemas/DisplayNameStylesRequest"}, {"type": "null"}]
+					},
 					"timezone": {
 						"description": "IANA timezone identifier saved for profile local time",
 						"type": ["string", "null"]
@@ -32509,6 +32521,10 @@
 					"mention_flags": {
 						"description": "The user's account-wide reply mention preference. Omitted when the user has no preference set (treated as NO_PREFERENCE).",
 						"$ref": "#/components/schemas/MentionReplyPreferences"
+					},
+					"display_name_styles": {
+						"description": "The font, effect and colors the user picked for their display name. Omitted when unset.",
+						"$ref": "#/components/schemas/DisplayNameStylesResponse"
 					},
 					"is_staff": {"type": "boolean", "description": "Whether the user has staff permissions"},
 					"acls": {
@@ -40451,6 +40467,20 @@
 				"x-enumNames": ["TOTP", "WEBAUTHN"],
 				"x-enumDescriptions": ["Time-based one-time password authenticator", "WebAuthn authenticator"]
 			},
+			"DisplayNameStylesResponse": {
+				"type": "object",
+				"properties": {
+					"font_id": {"description": "The display name font identifier", "$ref": "#/components/schemas/Int32Type"},
+					"effect_id": {"description": "The display name effect identifier", "$ref": "#/components/schemas/Int32Type"},
+					"colors": {
+						"type": "array",
+						"items": {"$ref": "#/components/schemas/Int32Type"},
+						"description": "The display name colors as integers"
+					}
+				},
+				"required": ["font_id", "effect_id", "colors"],
+				"additionalProperties": false
+			},
 			"MentionReplyPreferences": {
 				"description": "Reply mention preference",
 				"type": "integer",
@@ -46369,6 +46399,31 @@
 					"description": "A badge key: a built-in badge kind, or custom:{id} for a custom badge"
 				},
 				"description": "The full list of badge keys to hide from other people. It replaces the stored list, takes precedence over the deprecated hide fields, and keys of custom badges that no longer exist are dropped"
+			},
+			"DisplayNameStylesRequest": {
+				"type": "object",
+				"properties": {
+					"font_id": {
+						"type": "integer",
+						"minimum": -9007199254740991,
+						"maximum": 9007199254740991,
+						"description": "The display name font identifier"
+					},
+					"effect_id": {
+						"type": "integer",
+						"minimum": -9007199254740991,
+						"maximum": 9007199254740991,
+						"description": "The display name effect identifier"
+					},
+					"colors": {
+						"minItems": 1,
+						"maxItems": 2,
+						"type": "array",
+						"items": {"$ref": "#/components/schemas/ColorType"},
+						"description": "One or two colors as integers; gradient effects use both"
+					}
+				},
+				"required": ["font_id", "effect_id", "colors"]
 			},
 			"AttestedAgeFloorSchema": {
 				"type": "string",

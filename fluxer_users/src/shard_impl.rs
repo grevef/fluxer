@@ -10,7 +10,9 @@ use crate::types::{ApiUserPartial, UserPartial, UserRequest, UserResponse};
 use chrono::{DateTime, Utc};
 use fluxer_common::time::unix_millis;
 use fluxer_common::user_flags::{AccountStanding, USER_FLAG_STAFF};
-use fluxer_common::user_partial::{FLUXER_SYSTEM_DISCRIMINATOR, FLUXER_SYSTEM_USER_ID};
+use fluxer_common::user_partial::{
+    DisplayNameStyles, FLUXER_SYSTEM_DISCRIMINATOR, FLUXER_SYSTEM_USER_ID,
+};
 use fluxer_svc::shard::ShardService;
 use fluxer_svc::{postgres, postgres::KeyPart};
 use futures::stream::{self, StreamExt};
@@ -41,7 +43,8 @@ const PARTIAL_USER_COLUMNS: &str = "\
     avatar_hash, bot, system, flags, \
     banner_hash, banner_color, accent_color, avatar_color, \
     mention_flags, temp_banned_until, pending_deletion_at, deletion_reason_code, \
-    content_hidden_since, hidden_profile_badges";
+    content_hidden_since, hidden_profile_badges, \
+    display_name_font_id, display_name_effect_id, display_name_colors";
 const USER_BATCH_SIZE: usize = 128;
 const USER_BATCH_CONCURRENCY: usize = 8;
 const USER_CACHE_MIN_GENERATION_STRIPES: usize = 4096;
@@ -110,6 +113,12 @@ struct PartialUserDbRow {
     content_hidden_since: Option<i64>,
     #[serde(default)]
     hidden_profile_badges: Option<Vec<String>>,
+    #[serde(default)]
+    display_name_font_id: Option<i32>,
+    #[serde(default)]
+    display_name_effect_id: Option<i32>,
+    #[serde(default)]
+    display_name_colors: Option<Vec<i32>>,
 }
 
 #[cfg(feature = "scylla")]
@@ -133,6 +142,9 @@ struct PartialUserScyllaRow {
     deletion_reason_code: Option<i32>,
     content_hidden_since: OptionalTimestamp,
     hidden_profile_badges: Option<Vec<String>>,
+    display_name_font_id: Option<i32>,
+    display_name_effect_id: Option<i32>,
+    display_name_colors: Option<Vec<i32>>,
 }
 
 #[cfg(feature = "scylla")]
@@ -157,6 +169,9 @@ impl From<PartialUserScyllaRow> for PartialUserDbRow {
             deletion_reason_code: row.deletion_reason_code,
             content_hidden_since: optional_timestamp_millis(row.content_hidden_since),
             hidden_profile_badges: row.hidden_profile_badges,
+            display_name_font_id: row.display_name_font_id,
+            display_name_effect_id: row.display_name_effect_id,
+            display_name_colors: row.display_name_colors,
         }
     }
 }
@@ -496,6 +511,7 @@ fn system_user_partial(instance_name: &str) -> UserPartial {
         mention_flags: None,
         content_hidden_since: None,
         hidden_profile_badges: Vec::new(),
+        display_name_styles: None,
     }
 }
 
@@ -646,6 +662,11 @@ impl From<PartialUserDbRow> for UserPartial {
             mention_flags: row.mention_flags,
             content_hidden_since: row.content_hidden_since,
             hidden_profile_badges: row.hidden_profile_badges.unwrap_or_default(),
+            display_name_styles: DisplayNameStyles::from_columns(
+                row.display_name_font_id,
+                row.display_name_effect_id,
+                row.display_name_colors,
+            ),
         }
         .visible_to_others(&standing, unix_millis())
     }
@@ -675,6 +696,9 @@ mod tests {
             deletion_reason_code: None,
             content_hidden_since: None,
             hidden_profile_badges: None,
+            display_name_font_id: None,
+            display_name_effect_id: None,
+            display_name_colors: None,
         }
     }
 

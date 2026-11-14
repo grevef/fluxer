@@ -18,7 +18,9 @@ use crate::udt;
 use base64::prelude::{BASE64_STANDARD, Engine};
 use chrono::{DateTime, Utc};
 use fluxer_common::time::{unix_millis, unix_seconds};
-use fluxer_common::user_partial::{FLUXER_SYSTEM_USER_ID, UserPartialFields, fluxer_system_user};
+use fluxer_common::user_partial::{
+    DisplayNameStyles, FLUXER_SYSTEM_USER_ID, UserPartialFields, fluxer_system_user,
+};
 use fluxer_svc::shard::ShardService;
 use fluxer_svc::transport::Transport;
 use fluxer_svc::{postgres, postgres::BigIntBound, postgres::KeyPart};
@@ -261,6 +263,8 @@ struct UserPartialServiceResponse {
     content_hidden_since: Option<i64>,
     #[serde(default)]
     hidden_profile_badges: Vec<String>,
+    #[serde(default)]
+    display_name_styles: Option<DisplayNameStyles>,
 }
 
 #[derive(Debug, Default)]
@@ -1491,6 +1495,7 @@ impl<T: Transport> MessagesShard<T> {
                 system: None,
                 flags: 0,
                 mention_flags: None,
+                display_name_styles: None,
             };
         }
         deleted_user(0, &options.instance_name)
@@ -2942,6 +2947,7 @@ fn map_user_partial(partial: UserPartialServiceResponse) -> ApiUserPartial {
         flags: partial.flags,
         hidden_profile_badges: partial.hidden_profile_badges,
         mention_flags: partial.mention_flags,
+        display_name_styles: partial.display_name_styles,
     })
 }
 
@@ -2960,6 +2966,7 @@ fn deleted_user(user_id: i64, instance_name: &str) -> ApiUserPartial {
         system: None,
         flags: 0,
         mention_flags: None,
+        display_name_styles: None,
     }
 }
 

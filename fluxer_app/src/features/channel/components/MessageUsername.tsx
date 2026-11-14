@@ -12,6 +12,7 @@ import styles from '@app/features/theme/styles/Message.module.css';
 import FocusRing from '@app/features/ui/focus_ring/FocusRing';
 import KeyboardMode from '@app/features/ui/state/KeyboardMode';
 import type {User} from '@app/features/user/models/User';
+import {getDisplayNameStyleProps} from '@app/features/user/utils/DisplayNameStyleUtils';
 import * as NicknameUtils from '@app/features/user/utils/NicknameUtils';
 import {clsx} from 'clsx';
 import {observer} from 'mobx-react-lite';
@@ -41,6 +42,10 @@ export const MessageUsername = observer(
 		const contextMenuOpen = useContextMenuHoverState(usernameRef);
 		const displayName = previewName || NicknameUtils.getNickname(user, guild?.id, message.channelId);
 		const color = previewColor || member?.getColorString();
+		const nameStyleProps = getDisplayNameStyleProps(user.displayNameStyles, {
+			className: clsx(className, contextMenuOpen && styles.contextMenuUnderline),
+			fallbackColor: color,
+		});
 		const onPopoutToggle = useMaybeMessageViewContext()?.onPopoutToggle;
 		const handlePopoutOpen = useCallback(() => onPopoutToggle?.(true), [onPopoutToggle]);
 		const handlePopoutClose = useCallback(() => onPopoutToggle?.(false), [onPopoutToggle]);
@@ -54,8 +59,8 @@ export const MessageUsername = observer(
 		const usernameNode = (
 			<FocusRing data-flx="channel.message-username.focus-ring">
 				<span
-					className={clsx(className, contextMenuOpen && styles.contextMenuUnderline)}
-					style={{color}}
+					className={nameStyleProps.className}
+					style={nameStyleProps.style}
 					data-user-id={user.id}
 					data-guild-id={guild?.id}
 					tabIndex={keyboardModeEnabled ? 0 : undefined}

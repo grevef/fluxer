@@ -3,9 +3,11 @@
 import type {UserID} from '@app/api/BrandedTypes';
 import {LocalDate} from '@app/api/database/LocalDate';
 import type {UserRow} from '@app/api/database/types/UserTypes';
+import {displayNameStylesFromRow, displayNameStylesToRow} from '@app/api/user/DisplayNameStyles';
 import {checkIsPremium, getEffectivePremiumUntil} from '@app/api/user/UserHelpers';
 import {type AttestedAgeFloor, isAttestedAgeFloor} from '@fluxer/constants/src/AgeRangeConstants';
 import {isProfileBadgeKey, type ProfileBadgeKey} from '@fluxer/constants/src/BadgeConstants';
+import type {DisplayNameStyles} from '@fluxer/constants/src/DisplayNameStyleConstants';
 import {
 	extractPremiumFlagsFromLegacyUserFlags,
 	legacyHiddenProfileBadges,
@@ -36,6 +38,7 @@ export class User {
 	readonly bio: string | null;
 	readonly pronouns: string | null;
 	readonly accentColor: number | null;
+	readonly displayNameStyles: DisplayNameStyles | null;
 	readonly timezone: string | null;
 	readonly timezonePrivacyFlags: number;
 	readonly dateOfBirth: string | null;
@@ -105,6 +108,7 @@ export class User {
 		this.bio = row.bio ?? null;
 		this.pronouns = row.pronouns ?? null;
 		this.accentColor = row.accent_color ?? null;
+		this.displayNameStyles = displayNameStylesFromRow(row);
 		this.timezone = row.timezone ?? null;
 		this.timezonePrivacyFlags = row.timezone_privacy_flags ?? ProfileFieldPrivacyFlags.EVERYONE;
 		this.dateOfBirth = row.date_of_birth ? row.date_of_birth.toString() : null;
@@ -196,6 +200,7 @@ export class User {
 			bio: this.bio,
 			pronouns: this.pronouns,
 			accent_color: this.accentColor,
+			...displayNameStylesToRow(this.displayNameStyles),
 			timezone: this.timezone,
 			timezone_privacy_flags: this.timezonePrivacyFlags,
 			date_of_birth: this.dateOfBirth ? LocalDate.fromString(this.dateOfBirth) : null,

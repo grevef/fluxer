@@ -781,6 +781,7 @@ mod tests {
             system: None,
             flags: 0,
             mention_flags: None,
+            display_name_styles: None,
         };
         ApiMessageResponse {
             id: "2".to_string(),

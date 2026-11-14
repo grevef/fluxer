@@ -22,6 +22,7 @@ import {getAppRemScale} from '@app/features/ui/utils/AppZoomUtils';
 import type {User} from '@app/features/user/models/User';
 import type {CustomStatus} from '@app/features/user/state/CustomStatus';
 import * as AvatarUtils from '@app/features/user/utils/AvatarUtils';
+import {getDisplayNameStyleProps} from '@app/features/user/utils/DisplayNameStyleUtils';
 import * as NicknameUtils from '@app/features/user/utils/NicknameUtils';
 import {GuildFeatures} from '@fluxer/constants/src/GuildConstants';
 import type {StatusType} from '@fluxer/constants/src/StatusConstants';
@@ -179,11 +180,14 @@ export const MemberListItem: React.FC<MemberListItemProps> = observer((props) =>
 			size: MEMBER_AVATAR_SIZE * getAppRemScale(),
 		});
 	}, [guildId, guildMember, user]);
+	const styledNameProps = user.displayNameStyles
+		? getDisplayNameStyleProps(user.displayNameStyles, {className: styles.name, fallbackColor: roleColor})
+		: null;
 	const nameContent = (
 		<span
 			ref={nameRef}
-			className={clsx(styles.name, roleColor && styles.nameRoleColored)}
-			style={nameStyle}
+			className={styledNameProps?.className ?? clsx(styles.name, roleColor && styles.nameRoleColored)}
+			style={styledNameProps?.style ?? nameStyle}
 			data-flx="channel.member-list-item.name"
 		>
 			{nickname}

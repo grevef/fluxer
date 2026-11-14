@@ -45228,3 +45228,90 @@ msgstr "Zoom inn"
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts
 msgid "Zoom out"
 msgstr "Zoom ut"
+
+#. Heading of the profile setting that picks a font, effect and colors for the display name.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Display name style"
+msgstr "Visningsnavnstil"
+
+#. Description under the display name style heading in profile settings.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Pick a font, an effect and colors for your name in chat, the member list and your profile."
+msgstr "Velg en skrifttype, en effekt og farger for navnet ditt i chatten, medlemslisten og på profilen din."
+
+#. Notice shown on the display name style picker when the user does not have premium.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Display name styles are a premium perk."
+msgstr "Visningsnavnstiler er en premiumfordel."
+
+#. Label for the display name effect choices.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Effect"
+msgstr "Effekt"
+
+#. Label for the first display name style color when the chosen effect also uses a secondary color.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Primary color"
+msgstr "Primærfarge"
+
+#. Label for the second display name style color, used by gradient, toon and pop effects.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Secondary color"
+msgstr "Sekundærfarge"
+
+#. Button that saves the display name style.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Save style"
+msgstr "Lagre stil"
+
+#. Button that clears the display name style back to the plain name.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Remove style"
+msgstr "Fjern stil"
+
+#. Toast shown after the display name style is saved.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Display name style saved"
+msgstr "Visningsnavnstil lagret"
+
+#. Toast shown when saving the display name style fails.
+#: src/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker.tsx
+msgid "Could not save your display name style"
+msgstr "Kunne ikke lagre visningsnavnstilen din"
+
+#. Display name style effect: one flat color.
+#: src/features/user/utils/DisplayNameStyleUtils.ts
+msgid "Solid"
+msgstr "Ensfarget"
+
+#. Display name style effect: a blend from one color to another.
+#: src/features/user/utils/DisplayNameStyleUtils.ts
+msgid "Gradient"
+msgstr "Fargeovergang"
+
+#. Display name style effect: a glowing neon look.
+#: src/features/user/utils/DisplayNameStyleUtils.ts
+msgid "Neon"
+msgstr "Neon"
+
+#. Display name style effect: a cartoon look with an outline.
+#: src/features/user/utils/DisplayNameStyleUtils.ts
+msgid "Toon"
+msgstr "Tegneserie"
+
+#. Display name style effect: text with a hard offset shadow.
+#: src/features/user/utils/DisplayNameStyleUtils.ts
+msgid "Pop"
+msgstr "Pop"
+
+#. Title of the in-app admin panel page.
+#. Short label in the sidebar button that opens the admin panel inside the app.
+#: src/features/admin_panel/components/AdminPanelPage.tsx
+#: src/features/app/components/layout/sidebar_nav/AdminPanelButton.tsx
+msgid "Admin panel"
+msgstr "Adminpanel"
+
+#. Shown on the in-app admin panel page when the user lacks admin access.
+#: src/features/admin_panel/components/AdminPanelPage.tsx
+msgid "Your account does not have access to the admin panel."
+msgstr "Kontoen din har ikke tilgang til adminpanelet."

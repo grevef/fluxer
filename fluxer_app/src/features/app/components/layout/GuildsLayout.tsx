@@ -2,6 +2,7 @@
 
 import {Routes} from '@app/app/Routes';
 import Accessibility from '@app/features/accessibility/state/Accessibility';
+import {canAccessAdminPanel} from '@app/features/admin_panel/utils/AdminPanelAccess';
 import {useActiveNagbars, useNagbarConditions} from '@app/features/app/components/layout/app_layout/AppLayoutHooks';
 import {type NagbarState, NagbarType} from '@app/features/app/components/layout/app_layout/AppLayoutTypes';
 import {NagbarContainer} from '@app/features/app/components/layout/app_layout/NagbarContainer';
@@ -31,6 +32,7 @@ import {GuildRailLayoutItem} from '@app/features/app/components/layout/guilds_la
 import {OutlineFrame} from '@app/features/app/components/layout/OutlineFrame';
 import type {ScrollIndicatorSeverity} from '@app/features/app/components/layout/ScrollIndicatorStateMachine';
 import {AddGuildButton} from '@app/features/app/components/layout/sidebar_nav/AddGuildButton';
+import {AdminPanelButton} from '@app/features/app/components/layout/sidebar_nav/AdminPanelButton';
 import {DiscoveryButton} from '@app/features/app/components/layout/sidebar_nav/DiscoveryButton';
 import {DownloadButton} from '@app/features/app/components/layout/sidebar_nav/DownloadButton';
 import {FavoritesButton} from '@app/features/app/components/layout/sidebar_nav/FavoritesButton';
@@ -196,6 +198,7 @@ type GuildNavigationRow =
 	| (NavigationRow & {readonly kind: 'visiting-guild'; readonly guild: Guild})
 	| (NavigationRow & {readonly kind: 'discovery'})
 	| (NavigationRow & {readonly kind: 'add-guild'})
+	| (NavigationRow & {readonly kind: 'admin-panel'})
 	| (NavigationRow & {readonly kind: 'download'})
 	| (NavigationRow & {readonly kind: 'help'});
 
@@ -203,6 +206,7 @@ interface GuildNavigationVisibility {
 	readonly favoritesVisible: boolean;
 	readonly discoveryVisible: boolean;
 	readonly addGuildVisible: boolean;
+	readonly adminPanelVisible: boolean;
 	readonly downloadVisible: boolean;
 	readonly helpVisible: boolean;
 }
@@ -213,16 +217,18 @@ function useGuildNavigationVisibility(): GuildNavigationVisibility {
 	const favoritesVisible = Accessibility.showFavorites;
 	const downloadVisible = !Platform.isElectron && !Platform.isPWA && !HiddenGuildListButtons.downloadButtonHidden;
 	const helpVisible = !HiddenGuildListButtons.helpButtonHidden && Routes.help() != null;
+	const adminPanelVisible = canAccessAdminPanel(Users.getCurrentUser());
 	return useMemo(
 		() =>
 			Object.freeze({
 				favoritesVisible,
 				discoveryVisible,
 				addGuildVisible: communityActionsVisible,
+				adminPanelVisible,
 				downloadVisible,
 				helpVisible,
 			}),
-		[communityActionsVisible, discoveryVisible, downloadVisible, favoritesVisible, helpVisible],
+		[adminPanelVisible, communityActionsVisible, discoveryVisible, downloadVisible, favoritesVisible, helpVisible],
 	);
 }
 
@@ -345,6 +351,14 @@ function createGuildNavigationRows({
 			focusTargetIdentity: 'add-guild',
 		});
 	}
+	if (visibility.adminPanelVisible) {
+		rows.push({
+			kind: 'admin-panel',
+			key: 'admin-panel',
+			focusable: true,
+			focusTargetIdentity: 'admin-panel',
+		});
+	}
 	if (visibility.downloadVisible) {
 		rows.push({
 			kind: 'download',
@@ -369,6 +383,7 @@ function hasGapAfterGuildNavigationRow(row: GuildNavigationRow, nextRow: GuildNa
 		case 'fluxer':
 		case 'discovery':
 		case 'add-guild':
+		case 'admin-panel':
 		case 'download':
 			return true;
 		case 'favorites':
@@ -2103,6 +2118,8 @@ const GuildList = observer(() => {
 				return <DiscoveryButton data-flx="app.guilds-layout.render-guild-navigation-row.discovery-button" />;
 			case 'add-guild':
 				return <AddGuildButton data-flx="app.guilds-layout.render-guild-navigation-row.add-guild-button" />;
+			case 'admin-panel':
+				return <AdminPanelButton data-flx="app.guilds-layout.render-guild-navigation-row.admin-panel-button" />;
 			case 'download':
 				return <DownloadButton data-flx="app.guilds-layout.render-guild-navigation-row.download-button" />;
 			case 'help':

@@ -9,9 +9,9 @@ const {promisify} = require('node:util');
 const execFileAsync = promisify(execFile);
 const CHANNELS = {
 	stable: {
-		productName: 'Fluxer',
+		productName: 'CoreCord',
 		linuxOptDirName: 'Fluxer',
-		artifactProductName: 'Fluxer',
+		artifactProductName: 'CoreCord',
 		appId: 'app.fluxer',
 		iconDirectory: 'icons-stable',
 		packageName: 'fluxer_desktop',
@@ -24,9 +24,9 @@ const CHANNELS = {
 		provisioningProfile: 'build_resources/profiles/Fluxer.provisionprofile',
 	},
 	canary: {
-		productName: 'Fluxer Canary',
+		productName: 'CoreCord Canary',
 		linuxOptDirName: 'fluxer-canary',
-		artifactProductName: 'Fluxer-Canary',
+		artifactProductName: 'CoreCord-Canary',
 		appId: 'app.fluxer.canary',
 		iconDirectory: 'icons-canary',
 		packageName: 'fluxer_desktop_canary',
@@ -39,9 +39,9 @@ const CHANNELS = {
 		provisioningProfile: 'build_resources/profiles/Fluxer_Canary.provisionprofile',
 	},
 	development: {
-		productName: 'Fluxer Development',
+		productName: 'CoreCord Development',
 		linuxOptDirName: 'fluxer-development',
-		artifactProductName: 'Fluxer-Development',
+		artifactProductName: 'CoreCord-Development',
 		appId: 'app.fluxer.development',
 		iconDirectory: 'icons-development',
 		packageName: 'fluxer_desktop_development',

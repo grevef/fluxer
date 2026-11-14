@@ -17677,6 +17677,7 @@
 							"feature_animated_banner",
 							"feature_custom_discriminator",
 							"feature_custom_notification_sounds",
+							"feature_display_name_styles",
 							"feature_early_access",
 							"feature_global_expressions",
 							"feature_guild_create",
@@ -23063,6 +23064,10 @@
 					"mention_flags": {
 						"description": "The user's account-wide reply mention preference. Omitted when the user has no preference set (treated as NO_PREFERENCE).",
 						"allOf": [{"$ref": "#/components/schemas/MentionReplyPreferences"}]
+					},
+					"display_name_styles": {
+						"description": "The font, effect and colors the user picked for their display name. Omitted when unset.",
+						"allOf": [{"$ref": "#/components/schemas/DisplayNameStylesResponse"}]
 					}
 				},
 				"required": ["id", "username", "discriminator", "global_name", "avatar", "avatar_color", "flags"],
@@ -23152,6 +23157,26 @@
 					"A reply message",
 					"The first message of a thread, pointing at its source"
 				]
+			},
+			"DisplayNameStylesResponse": {
+				"type": "object",
+				"properties": {
+					"font_id": {
+						"description": "The display name font identifier",
+						"allOf": [{"$ref": "#/components/schemas/Int32Type"}]
+					},
+					"effect_id": {
+						"description": "The display name effect identifier",
+						"allOf": [{"$ref": "#/components/schemas/Int32Type"}]
+					},
+					"colors": {
+						"type": "array",
+						"items": {"$ref": "#/components/schemas/Int32Type"},
+						"description": "The display name colors as integers"
+					}
+				},
+				"required": ["font_id", "effect_id", "colors"],
+				"additionalProperties": false
 			},
 			"MentionReplyPreferences": {
 				"description": "Reply mention preference",

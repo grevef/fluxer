@@ -13,6 +13,8 @@ import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
 import type {User} from '@app/api/models/User';
 import {RpcTimingRecorder, type RpcTimingSteps, startRpcTiming, timeRpcStep} from '@app/api/rpc/RpcTimings';
 import type {UserData} from '@app/api/rpc/RpcTypes';
+import {userHasDisplayNameStylesEntitlement} from '@app/api/user/DisplayNameStyleEntitlement';
+import {displayNameStylesToRow} from '@app/api/user/DisplayNameStyles';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import {createPremiumClearPatch, shouldStripExpiredPremium} from '@app/api/user/UserHelpers';
 import {dispatchUserUpdate} from '@app/api/user/UserMappers';
@@ -155,6 +157,25 @@ export class RpcSessionStartService {
 			} finally {
 				timings.record('reset_expired_premium_discriminator', resetDiscriminatorStartedAtNs, resetDiscriminatorSteps);
 			}
+		}
+		if (user.displayNameStyles !== null && !userHasDisplayNameStylesEntitlement(user)) {
+			await timings.time('clear_unentitled_display_name_styles', async () => {
+				try {
+					const updatedUser = await this.deps.userRepository.patchUpsert(
+						user.id,
+						displayNameStylesToRow(null),
+						user.toRow(),
+					);
+					if (updatedUser) {
+						user = updatedUser;
+						userData.user = updatedUser;
+						this.deps.userCacheService.setUserPartialResponseFromUserInBackground(updatedUser, requestCache);
+						await dispatchUserUpdate(this.deps.gatewayService, updatedUser);
+					}
+				} catch (error) {
+					Logger.warn({userId: user.id.toString(), error}, 'Failed to clear display name styles after premium ended');
+				}
+			});
 		}
 		if (hadPremium && !isPremium && !hasBeenSanitized) {
 			const sanitizePremiumSteps: RpcTimingSteps = {};

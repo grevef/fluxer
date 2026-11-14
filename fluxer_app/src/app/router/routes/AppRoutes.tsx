@@ -107,6 +107,10 @@ const OperatorPassRoutePage = createNamedLoadableComponent<AppRouteComponentProp
 	load: async () =>
 		(await import('@app/features/premium/components/operator_pass/OperatorPassRoutePage')).OperatorPassRoutePage,
 });
+const AdminPanelPage = createNamedLoadableComponent<AppRouteComponentProps>({
+	displayName: 'AdminPanelPage',
+	load: async () => (await import('@app/features/admin_panel/components/AdminPanelPage')).AdminPanelPage,
+});
 const StatusChangeBottomSheet = createNamedLoadableComponent<AppRouteComponentProps>({
 	displayName: 'StatusChangeBottomSheet',
 	load: async () =>
@@ -282,6 +286,13 @@ const operatorPassRoute = createRoute({
 		</DMLayout>
 	),
 });
+const adminPanelRoute = createRoute({
+	getParentRoute: () => guildsLayoutRoute,
+	id: 'adminPanel',
+	path: Routes.ADMIN_PANEL,
+	preload: AdminPanelPage.preload,
+	component: () => <AdminPanelPage data-flx="app.router.app-routes.admin-panel-page" />,
+});
 const userProfileRoute = createRoute({
 	getParentRoute: () => appLayoutRoute,
 	id: 'userProfile',
@@ -422,6 +433,7 @@ export const appRouteTree = appLayoutRoute.addChildren([
 		plutoniumRoute,
 		legacyPlutoniumRoute,
 		operatorPassRoute,
+		adminPanelRoute,
 		favoritesRoute.addChildren([favoritesChannelRoute]),
 		channelsRoute.addChildren([membersRoute, channelRoute.addChildren([messageRoute, threadPanelRoute])]),
 	]),

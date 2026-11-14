@@ -48,6 +48,7 @@ export const Routes = {
 	PLUTONIUM: '/channels/@premium',
 	LEGACY_PLUTONIUM: '/plutonium',
 	OPERATOR_PASS: '/channels/@operator-pass',
+	ADMIN_PANEL: '/channels/@admin',
 	CHECKOUT: '/channels/@checkout/:product',
 	terms: (): string | null => RuntimeConfig.termsUrl ?? hostedMarketingUrl('terms'),
 	privacy: (): string | null => RuntimeConfig.privacyUrl ?? hostedMarketingUrl('privacy'),
@@ -87,6 +88,7 @@ export const Routes = {
 		pathname === Routes.YOU,
 	isDMRoute: (pathname: string) => pathname.startsWith('/channels/@me'),
 	isFavoritesRoute: (pathname: string) => pathname.startsWith('/channels/@favorites'),
+	isAdminPanelRoute: (pathname: string) => pathname.startsWith(Routes.ADMIN_PANEL),
 	isDiscoverRoute: (pathname: string) =>
 		pathname.startsWith(Routes.DISCOVER) || pathname.startsWith(Routes.LEGACY_DISCOVER),
 	isChannelRoute: (pathname: string) => {

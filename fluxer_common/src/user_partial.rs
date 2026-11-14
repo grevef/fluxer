@@ -11,6 +11,27 @@ pub fn default_instance_name() -> String {
     UPSTREAM_INSTANCE_NAME.to_owned()
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DisplayNameStyles {
+    pub font_id: i32,
+    pub effect_id: i32,
+    pub colors: Vec<i32>,
+}
+
+impl DisplayNameStyles {
+    pub fn from_columns(
+        font_id: Option<i32>,
+        effect_id: Option<i32>,
+        colors: Option<Vec<i32>>,
+    ) -> Option<Self> {
+        Some(Self {
+            font_id: font_id?,
+            effect_id: effect_id.unwrap_or_default(),
+            colors: colors.unwrap_or_default(),
+        })
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiUserPartial {
     pub id: String,
@@ -26,6 +47,8 @@ pub struct ApiUserPartial {
     pub flags: i32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mention_flags: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display_name_styles: Option<DisplayNameStyles>,
 }
 
 pub struct UserPartialFields {
@@ -40,6 +63,7 @@ pub struct UserPartialFields {
     pub flags: Option<i64>,
     pub hidden_profile_badges: Vec<String>,
     pub mention_flags: Option<i32>,
+    pub display_name_styles: Option<DisplayNameStyles>,
 }
 
 impl From<UserPartialFields> for ApiUserPartial {
@@ -61,6 +85,7 @@ impl From<UserPartialFields> for ApiUserPartial {
                 &partial.hidden_profile_badges,
             ),
             mention_flags: partial.mention_flags.filter(|flags| *flags != 0),
+            display_name_styles: partial.display_name_styles,
         }
     }
 }
@@ -77,5 +102,6 @@ pub fn fluxer_system_user(instance_name: String) -> ApiUserPartial {
         system: Some(true),
         flags: USER_FLAG_STAFF as i32,
         mention_flags: None,
+        display_name_styles: None,
     }
 }

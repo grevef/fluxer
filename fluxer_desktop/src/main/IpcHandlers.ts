@@ -15,6 +15,7 @@ import type {
 	MediaAccessType,
 	TrayPresenceStatus,
 } from '@electron/common/Types';
+import {registerAdminPanelViewIpcHandlers} from '@electron/main/AdminPanelView';
 import {DesktopBrowserHandoff} from '@electron/main/BrowserHandoff';
 import {hasEnabledBlinkFeature, MIDDLE_CLICK_AUTOSCROLL_BLINK_FEATURE} from '@electron/main/ChromiumRuntime';
 import {setHandoffReturnLinkSink} from '@electron/main/DeepLinks';
@@ -181,6 +182,7 @@ function applyUnreadBadge(badge: number): void {
 }
 
 export function registerIpcHandlers(): void {
+	registerAdminPanelViewIpcHandlers();
 	registerVoiceDebugEventSinkPopoutIpcHandlers();
 	registerVoiceBackgroundMediaCacheHandlers();
 	ipcMain.handle(DESKTOP_MODULE_CHANNELS.ensure, (event, moduleName: unknown) => {

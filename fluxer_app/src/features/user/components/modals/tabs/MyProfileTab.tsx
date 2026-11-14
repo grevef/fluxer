@@ -36,6 +36,7 @@ import {
 } from '@app/features/user/components/modals/tabs/my_profile_tab/AvatarUploader';
 import {BannerUploader} from '@app/features/user/components/modals/tabs/my_profile_tab/BannerUploader';
 import {BIO_MARKDOWN_PARSER_FLAGS, BioEditor} from '@app/features/user/components/modals/tabs/my_profile_tab/BioEditor';
+import {DisplayNameStylePicker} from '@app/features/user/components/modals/tabs/my_profile_tab/DisplayNameStylePicker';
 import {UsernameSection} from '@app/features/user/components/modals/tabs/my_profile_tab/MyProfileTabUsernameSection';
 import {PerGuildPremiumUpsell} from '@app/features/user/components/modals/tabs/my_profile_tab/PerGuildPremiumUpsell';
 import {
@@ -940,6 +941,14 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 											data-flx="user.my-profile-tab.my-profile-tab-component.accent-color-picker.set-value"
 										/>
 									</div>
+									{!isPerGuildProfile && user && (
+										<DisplayNameStylePicker
+											user={user}
+											previewName={form.watch('global_name') || user.globalName || user.username}
+											disabled={isProfileCustomizationLocked}
+											data-flx="user.my-profile-tab.my-profile-tab-component.display-name-style-picker"
+										/>
+									)}
 									<div
 										className={isPerGuildProfile && !hasPerGuildProfiles ? styles.opacityHalf : ''}
 										data-flx="user.my-profile-tab.my-profile-tab-component.opacity-half--2"
